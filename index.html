@@ -26,10 +26,18 @@
     <div id = "chat">
         <h1 id="chat_header">Lobby: </h1>
         <input type="button" value="Return to lobby selector" onclick="returnToLobbySelector()">
+        <br><hr>
+        <input type="button" value="Previous Page" disabled onclick="changePage(1)">
+        <input type="button" value="Next Page" disabled onclick="changePage(-1)">
+        <hr>
+        
         <div id="message_board">
         </div>
+        <hr>
         <input id = "message" type="text" value="">
         <input type="button" value="Send Message" onclick="sendMessage()">
+        <br><hr>
+        <input type="button" value="Load Messages History" onclick="loadHistory()">
 
 
     </div>
@@ -75,6 +83,12 @@
         console.log(username + ' sent message to lobby ' + lobby_id + " message " + message_text)
         socket.emit('send_message', { user: username, lobby: lobby_id, message: message_text})
     }
+    function loadHistory(){
+        socket.emit('retrieve_history', lobby_id)
+    }
+    function changePage(){
+
+    }
     function updateText(new_message_data){
         const mes = document.createElement("p");
         mes.innerText = new_message_data.user + ': ' + new_message_data.message;
@@ -83,15 +97,22 @@
     function cleanText(){
         document.getElementById("message_board").innerHTML = ""; 
     }
+    socket.on('receive_message', (data) => {
+        console.log(data.user + ': ' + data.message)
+        updateText(data)
+    })
+    socket.on('load_history', (data) => {
+        console.log("This lobby history is")
+        cleanText()
+        data.forEach(message => {
+            updateText(message)
+        });
+    })
     document.getElementById('message').addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
         sendMessage()
     }
     })
-    socket.on('receive_message', (data) => {
-    console.log(data.user + ': ' + data.message)
-    updateText(data)
-    })
-  </script>
+    </script>
 </body>
 </html>
