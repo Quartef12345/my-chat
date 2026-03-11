@@ -5,6 +5,7 @@ const io = require('socket.io')(http)
 
 let lobbys_history = {}
 
+
 // Serve o ficheiro index.html
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html')

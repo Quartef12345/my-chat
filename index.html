@@ -27,8 +27,11 @@
         <h1 id="chat_header">Lobby: </h1>
         <input type="button" value="Return to lobby selector" onclick="returnToLobbySelector()">
         <br><hr>
-        <input type="button" value="Previous Page" disabled onclick="changePage(1)">
-        <input type="button" value="Next Page" disabled onclick="changePage(-1)">
+        <p>
+        <input id = "previous_page_bt"type="button" disabled value="Previous Page" onclick="changePage(-1)">
+        <span id = "page_number">1/1</span> 
+        <input id = "next_page_bt" type="button" disabled value="Next Page" onclick="changePage(1)">
+        </p>
         <hr>
         
         <div id="message_board">
@@ -50,7 +53,12 @@
     document.getElementById('chat').style.display = 'none'
     let username = ""
     let lobby_id = 0
-    
+    let lobby_history = []
+    let messages_array = []
+    let current_page = 1
+    const messages_per_page = 10
+
+
     function logIn(){
         username = document.getElementById('username').value
         console.log(username)
@@ -86,8 +94,29 @@
     function loadHistory(){
         socket.emit('retrieve_history', lobby_id)
     }
-    function changePage(){
-
+    function changePage(factor){
+        current_page += factor
+        if(current_page == 1){
+            document.getElementById("previous_page_bt").disabled = true
+        }
+        else{
+            document.getElementById("previous_page_bt").disabled = false
+        }
+        if(current_page * messages_per_page >= messages_array.length){
+            document.getElementById("next_page_bt").disabled = true
+        }
+        else{
+            document.getElementById("next_page_bt").disabled = false
+        }
+        document.getElementById("page_number").innerText = current_page + "/" + Math.floor((messages_array.length / messages_per_page) + 1)
+        updateTextPage()
+    }
+    function updateTextPage(){
+        cleanText()
+        page_messages = messages_array.slice((current_page - 1) * messages_per_page, messages_per_page * current_page)
+        page_messages.forEach(message => {
+        updateText(message)
+        });
     }
     function updateText(new_message_data){
         const mes = document.createElement("p");
@@ -104,9 +133,12 @@
     socket.on('load_history', (data) => {
         console.log("This lobby history is")
         cleanText()
+        lobby_history = data
+        messages_array = data
         data.forEach(message => {
             updateText(message)
         });
+        changePage( -current_page + Math.floor((messages_array.length / messages_per_page) + 1))
     })
     document.getElementById('message').addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
