@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat</title>
+</head>
+<body>
+    <div id = "login">
+        <h1>Hello!</h1>
+        <h3>Log In to Start Chatting!!</h3>
+        <p>Username:</p>
+        <input type="text" id="username" name="Username">
+        <input type="button" value="Log In" onclick="logIn()">
+
+
+    </div>
+
+    <div id = "lobby_selector">
+        <h1 id="lobby_selector_welcome_header">Welcome </h1>
+        <h3>Choose a lobby number to chat</h3>
+        <p>Lobby:</p>
+        <input id = "lobby_id" type="number" value="0000">
+        <input type="button" value="Log In" onclick="lobby()">
+
+
+    </div>
+    <div id = "chat">
+        <h1 id="chat_header">Lobby: </h1>
+        <input type="button" value="Return to lobby selector" onclick="returnToLobbySelector()">
+        <div id="message_board">
+        </div>
+        <input id = "message" type="text" value="">
+        <input type="button" value="Send Message" onclick="sendMessage()">
+
+
+    </div>
+  <!-- Carrega o Socket.io do servidor -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io()
+    console.log('Ligado ao servidor!')
+    document.getElementById('lobby_selector').style.display = 'none'
+    document.getElementById('chat').style.display = 'none'
+    let username = ""
+    let lobby_id = 0
+    
+    function logIn(){
+        username = document.getElementById('username').value
+        console.log(username)
+        document.getElementById('login').style.display = 'none'
+        document.getElementById('lobby_selector').style.display = 'block'
+
+        document.getElementById("lobby_selector_welcome_header").textContent = "Welcome " + username
+    }
+    function lobby(){
+        lobby_id = document.getElementById('lobby_id').value
+        document.getElementById('lobby_selector').style.display = 'none'
+        document.getElementById('chat').style.display = 'block'
+        document.getElementById("chat_header").textContent = "Lobby: " + lobby_id
+        
+        console.log(lobby_id)
+        cleanText() 
+        socket.emit('enter_lobby', { user: username, lobby: lobby_id })
+    }
+    function returnToLobbySelector(){
+        document.getElementById('lobby_selector').style.display = 'block'
+        document.getElementById('chat').style.display = 'none'
+        document.getElementById("lobby_selector_welcome_header").textContent = "Welcome " + username
+        
+        console.log(lobby_id)
+        socket.emit('left_lobby', { user: username, lobby: lobby_id })
+    }
+    function sendMessage(){
+        let message_text =  document.getElementById('message').value
+        document.getElementById('message').value = ""
+        console.log(username + ' sent message to lobby ' + lobby_id + " message " + message_text)
+        socket.emit('send_message', { user: username, lobby: lobby_id, message: message_text})
+    }
+    function updateText(new_message_data){
+        const mes = document.createElement("p");
+        mes.innerText = new_message_data.user + ': ' + new_message_data.message;
+        document.getElementById("message_board").appendChild(mes);
+    }
+    function cleanText(){
+        document.getElementById("message_board").innerHTML = ""; 
+    }
+    document.getElementById('message').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        sendMessage()
+    }
+    })
+    socket.on('receive_message', (data) => {
+    console.log(data.user + ': ' + data.message)
+    updateText(data)
+    })
+  </script>
+</body>
+</html>
