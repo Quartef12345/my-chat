@@ -4,6 +4,7 @@ body {
     font-family: 'Inter', sans-serif;
     margin: 0;                   /* remove a margem default do browser */
     padding: 20px;
+    zoom: 0.9;
 }
 
 #message_board {
