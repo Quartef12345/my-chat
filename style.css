@@ -1,0 +1,39 @@
+body {
+    background-color: #96D1E9;  /* cor de fundo */
+    color: #003A8A;              /* cor do texto */
+    font-family: 'Inter', sans-serif;
+    margin: 0;                   /* remove a margem default do browser */
+    padding: 20px;
+}
+
+#message_board {
+    width: 900px;
+    height: 250px;
+    background-color: #E0E5FF;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #003A8A;
+}
+
+input {
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #003A8A;
+    background-color: #E0E5FF;
+    border: 2px solid #003A8A;
+    cursor: pointer;
+}
+#message {
+    width: 500px;
+}
+
+input[type="text"]:focus, input[type="number"]:focus {
+    background-color: #E0E5FF;  /* a tua cor de fundo */
+    color: #003A8A;              /* a tua cor de texto */
+    outline: 2px solid #B4BBFE; /* borda quando selecionado */
+}
+
+hr {
+    border: none;
+    border-top: 2px solid #003A8A;
+}
