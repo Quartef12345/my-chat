@@ -4,6 +4,7 @@ const http = require('http').createServer(app)
 const io = require('socket.io')(http)
 
 let lobbys_history = {}
+let users = {}
 
 app.use(express.static(__dirname))
 // Serve o ficheiro index.html
@@ -18,6 +19,22 @@ io.on('connection', (socket) => {
   // Quando alguém se desliga
   socket.on('disconnect', () => {
     console.log('Someon Left!')
+  })
+
+  socket.on('create_account', (data) => {
+    users[data.user] = data.password
+  })
+  socket.on("log_in", (data) => {
+    if(Object.keys(users).includes(data.user)){
+      if(users[data.user] == data.password){
+        socket.emit('login_successful')
+      }else{
+      socket.emit("login_error")
+      }
+    }
+    else{
+      socket.emit("login_error")
+    }
   })
   socket.on('enter_lobby', (data) => {
     console.log(data.user + ' connected to the lobby ' + data.lobby)

@@ -12,7 +12,32 @@
         <h3>Log In to Start Chatting!!</h3>
         <p>Username:</p>
         <input type="text" id="username" name="Username">
+        <p>Password</p>
+        <input type="password" id="password">
+        <br><br>
         <input type="button" value="Log In" onclick="logIn()">
+        <br><br>
+        <input type="button" value="Create Account" onclick="accountCreation()">
+    </div>
+
+    <div id = "create_account">
+        <h1>New Account</h1>
+        <h3>Credentials</h3>
+        <p>Username:</p>
+        <input type="text" id="create_username" name="Username">
+        <p>Password</p>
+        <input type="password" id="create_password">
+        <p>Confirm password</p>
+        <input type="password" id="confirm_password">
+        <p>
+            <span>
+                <input type="checkbox" id="agree">
+                <b>Learning Project: </b>I understand this site is a learning project and not a secure production environment. I agree not to use a real password or any sensitive personal information that I use on other websites.
+            </span>
+        </p>
+        <hr>
+        <p id = "error_text"></p>
+        <input type="button" value="Create Account" onclick="create_account()">
 
 
     </div>
@@ -54,7 +79,11 @@
     console.log('Ligado ao servidor!')
     document.getElementById('lobby_selector').style.display = 'none'
     document.getElementById('chat').style.display = 'none'
+    document.getElementById('create_account').style.display = 'none'
     let username = ""
+    let password = ""
+    let confirm_password = ""
+    let agree = false
     let lobby_id = 0
     let lobby_history = []
     let messages_array = []
@@ -64,11 +93,33 @@
 
     function logIn(){
         username = document.getElementById('username').value
-        console.log(username)
+        password = document.getElementById('password').value
+        socket.emit('log_in', { user: username, password: password})
         document.getElementById('login').style.display = 'none'
         document.getElementById('lobby_selector').style.display = 'block'
 
         document.getElementById("lobby_selector_welcome_header").textContent = "Welcome " + username
+    }
+    function accountCreation(){
+        document.getElementById('login').style.display = 'none'
+        document.getElementById('create_account').style.display = 'block'
+    }
+    function create_account(){
+        username = document.getElementById('create_username').value
+        password = document.getElementById('create_password').value
+        confirm_password = document.getElementById("confirm_password").value
+
+        if(username.length != 0 || password.length != 0){
+            if(password == confirm_password){
+                if(document.getElementById("agree").checked){
+                    socket.emit('create_account', { user: username, password: password})
+                }else{
+                document.getElementById("error_text").innerText = 'You must agree to the "Learning Project" disclaimer and confirm you are not using sensitive personal information before creating an account.'
+                }
+            }else{
+                document.getElementById("error_text").innerText = "Please make sure both password fields are identical."}
+            }else{
+                document.getElementById("error_text").innerText = "Please enter both a username and a password to continue."}
     }
     function lobby(){
         lobby_id = document.getElementById('lobby_id').value
