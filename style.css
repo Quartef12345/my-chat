@@ -28,9 +28,10 @@ input {
     cursor: pointer;
 }
 input:focus {
-    background-color: #E0E5FF;  /* a tua cor de fundo */
-    color: #003A8A;              /* a tua cor de texto */
-    outline: 2px solid #B4BBFE; /* borda quando selecionado */
+    background-color: #E0E5FF;
+    color: #003A8A;
+    outline: 2px solid #B4BBFE;
+    
 }
 
 

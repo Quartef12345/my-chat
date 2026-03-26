@@ -22,7 +22,17 @@ io.on('connection', (socket) => {
   })
 
   socket.on('create_account', (data) => {
-    users[data.user] = data.password
+    console.log("Lets see if you can create an account")
+    if(Object.keys(users).includes(data.user)){
+      account_reponse = "error_username_in_use"
+    }
+    else{
+      users[data.user] = data.password
+      account_reponse = "account_created"
+    }
+    console.log(users)
+    console.log(account_reponse)
+    socket.emit("create_account_response", account_reponse)
   })
   socket.on("log_in", (data) => {
     if(Object.keys(users).includes(data.user)){

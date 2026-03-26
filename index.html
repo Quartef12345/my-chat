@@ -15,6 +15,7 @@
         <p>Password</p>
         <input type="password" id="password">
         <br><br>
+        <p id = "error_text_login"></p>
         <input type="button" value="Log In" onclick="logIn()">
         <br><br>
         <input type="button" value="Create Account" onclick="accountCreation()">
@@ -90,28 +91,31 @@
     let current_page = 1
     const messages_per_page = 7
 
-
+    function logInPage(){
+        document.getElementById('login').style.display = 'block'
+        document.getElementById('lobby_selector').style.display = 'none'
+        document.getElementById('chat').style.display = 'none'
+        document.getElementById('create_account').style.display = 'none'
+    }
     function logIn(){
         username = document.getElementById('username').value
         password = document.getElementById('password').value
         socket.emit('log_in', { user: username, password: password})
-        document.getElementById('login').style.display = 'none'
-        document.getElementById('lobby_selector').style.display = 'block'
-
-        document.getElementById("lobby_selector_welcome_header").textContent = "Welcome " + username
     }
     function accountCreation(){
         document.getElementById('login').style.display = 'none'
         document.getElementById('create_account').style.display = 'block'
     }
     function create_account(){
+        console.log("Create Account")
         username = document.getElementById('create_username').value
         password = document.getElementById('create_password').value
         confirm_password = document.getElementById("confirm_password").value
 
-        if(username.length != 0 || password.length != 0){
+        if(username.length != 0 && password.length != 0){
             if(password == confirm_password){
                 if(document.getElementById("agree").checked){
+                    console.log("Create account, confirm")
                     socket.emit('create_account', { user: username, password: password})
                 }else{
                 document.getElementById("error_text").innerText = 'You must agree to the "Learning Project" disclaimer and confirm you are not using sensitive personal information before creating an account.'
@@ -180,6 +184,24 @@
     function cleanText(){
         document.getElementById("message_board").innerHTML = ""; 
     }
+    socket.on('create_account_response', (data) => {
+        console.log("Account Created Response")
+        if(data == "error_username_in_use"){
+                document.getElementById("error_text").innerText = 'This username is already associated with an account. Please choose a different username.'
+        }
+        else if(data == "account_created"){
+            logInPage()
+        }
+    })
+    socket.on('login_successful', () => {
+        document.getElementById('login').style.display = 'none'
+        document.getElementById('lobby_selector').style.display = 'block'
+
+        document.getElementById("lobby_selector_welcome_header").textContent = "Welcome " + username
+    })
+    socket.on('login_error', () => {
+        document.getElementById('error_text_login').innerText = "We could not verify your account with the information provided. Please check your username and password and try again."
+    })
     socket.on('receive_message', (data) => {
         console.log(data.user + ': ' + data.message)
         messages_array.push(data)
